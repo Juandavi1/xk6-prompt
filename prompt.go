@@ -24,16 +24,8 @@ func (p *Prompt) ReadInt(label string) interface{} {
 	mutex.Lock()
 	defer mutex.Unlock()
 
-	values := promptsValues.Load()
-	if values == nil {
-		executions := make(map[string]interface{}, 100)
-		promptsValues.Store(executions)
-	}
-
-	executions := promptsValues.Load().(map[string]interface{})
-
-	if executions[label] != nil {
-		return executions[label]
+	if value, ok := ReadInputFromAtomic[string](label); ok {
+		return value
 	}
 
 	validate := func(input string) error {
@@ -58,11 +50,7 @@ func (p *Prompt) ReadInt(label string) interface{} {
 
 	number, _ := strconv.ParseInt(result, 10, 64)
 
-	executions[label] = result
-
-	promptsValues.Store(executions)
-
-	return number
+	return LoadInputInAtomic[int64](label, number)
 
 }
 
@@ -72,16 +60,8 @@ func (p *Prompt) ReadString(label string) interface{} {
 	mutex.Lock()
 	defer mutex.Unlock()
 
-	values := promptsValues.Load()
-	if values == nil {
-		executions := make(map[string]interface{}, 100)
-		promptsValues.Store(executions)
-	}
-
-	executions := promptsValues.Load().(map[string]interface{})
-
-	if executions[label] != nil {
-		return executions[label]
+	if value, ok := ReadInputFromAtomic[string](label); ok {
+		return value
 	}
 
 	prompt := promptui.Prompt{
@@ -95,11 +75,7 @@ func (p *Prompt) ReadString(label string) interface{} {
 		return ""
 	}
 
-	executions[label] = result
-
-	promptsValues.Store(executions)
-
-	return result
+	return LoadInputInAtomic[string](label, result)
 
 }
 
@@ -108,16 +84,8 @@ func (p *Prompt) Select(label string, options ...string) interface{} {
 	mutex.Lock()
 	defer mutex.Unlock()
 
-	values := promptsValues.Load()
-	if values == nil {
-		executions := make(map[string]interface{}, 100)
-		promptsValues.Store(executions)
-	}
-
-	executions := promptsValues.Load().(map[string]interface{})
-
-	if executions[label] != nil {
-		return executions[label]
+	if value, ok := ReadInputFromAtomic[string](label); ok {
+		return value
 	}
 
 	prompt := promptui.Select{
@@ -132,10 +100,40 @@ func (p *Prompt) Select(label string, options ...string) interface{} {
 		return ""
 	}
 
-	executions[label] = result
+	return LoadInputInAtomic[string](label, result)
 
-	promptsValues.Store(executions)
+}
 
-	return result
+// ReadInputFromAtomic read an input entered from a cached list
+func ReadInputFromAtomic[T interface{}](label string) (T, bool) {
+	values := promptsValues.Load()
+	if values == nil {
+		inputsCached := make(map[string]T, 100)
+		promptsValues.Store(inputsCached)
+	}
 
+	inputsCached := promptsValues.Load().(map[string]T)
+
+	if value, found := inputsCached[label]; found {
+		return value, true
+	}
+
+	return *new(T), false
+}
+
+// LoadInputInAtomic write an input entered into an atomic map to be read by other Goroutines
+func LoadInputInAtomic[T interface{}](label string, value T) T {
+	values := promptsValues.Load()
+	if values == nil {
+		inputsCached := make(map[string]T, 100)
+		promptsValues.Store(inputsCached)
+	}
+
+	inputsCached := promptsValues.Load().(map[string]T)
+
+	inputsCached[label] = value
+
+	promptsValues.Store(inputsCached)
+
+	return value
 }
