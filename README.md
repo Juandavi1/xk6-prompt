@@ -18,7 +18,7 @@ go install go.k6.io/xk6/cmd/xk6@latest
 2. Build the extension using:
 
 ```shell
-xk6 build --with github.com/Juandavi1/xk6-prompt
+xk6 build --with github.com/Juandavi1/xk6-prompt@0.0.1
 ```
 
 #### Import
