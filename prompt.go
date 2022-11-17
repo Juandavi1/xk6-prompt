@@ -24,7 +24,7 @@ func (p *Prompt) ReadInt(label string) interface{} {
 	mutex.Lock()
 	defer mutex.Unlock()
 
-	if value, ok := ReadInputFromAtomic[string](label); ok {
+	if value, ok := ReadInputFromAtomic[int64](label); ok {
 		return value
 	}
 
@@ -108,14 +108,14 @@ func (p *Prompt) Select(label string, options ...string) interface{} {
 func ReadInputFromAtomic[T interface{}](label string) (T, bool) {
 	values := promptsValues.Load()
 	if values == nil {
-		inputsCached := make(map[string]T, 100)
+		inputsCached := make(map[string]interface{}, 100)
 		promptsValues.Store(inputsCached)
 	}
 
-	inputsCached := promptsValues.Load().(map[string]T)
+	inputsCached := promptsValues.Load().(map[string]interface{})
 
 	if value, found := inputsCached[label]; found {
-		return value, true
+		return value.(T), true
 	}
 
 	return *new(T), false
@@ -125,11 +125,11 @@ func ReadInputFromAtomic[T interface{}](label string) (T, bool) {
 func LoadInputInAtomic[T interface{}](label string, value T) T {
 	values := promptsValues.Load()
 	if values == nil {
-		inputsCached := make(map[string]T, 100)
+		inputsCached := make(map[string]interface{}, 100)
 		promptsValues.Store(inputsCached)
 	}
 
-	inputsCached := promptsValues.Load().(map[string]T)
+	inputsCached := promptsValues.Load().(map[string]interface{})
 
 	inputsCached[label] = value
 
