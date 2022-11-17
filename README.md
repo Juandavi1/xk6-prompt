@@ -26,6 +26,11 @@ xk6 build --with github.com/Juandavi1/xk6-prompt@0.0.1
 import prompt from 'k6/x/prompt';
 ```
 
+> :warning: **If you are in a continuous testing environment, dont forget to add the conditional to read prompt inputs from [__ENV](https://k6.io/docs/using-k6/environment-variables/)**
+
+> :warning: **Example: const myNumber = __ENV.value ? __ENV.value : prompt.readInt("enter number")**
+
+
 #### Input select
 ```js
 const options = ["smoke", "load"]
