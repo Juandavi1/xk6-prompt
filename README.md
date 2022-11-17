@@ -48,3 +48,6 @@ console.log(typeof inputString)
 const inputNumber = prompt.readInt("Type a number")
 console.log(typeof inputNumber)
 ```
+
+### It works with options model 
+![options](carbon.png)
