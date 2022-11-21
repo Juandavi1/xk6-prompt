@@ -49,5 +49,5 @@ const inputNumber = prompt.readInt("Type a number")
 console.log(typeof inputNumber)
 ```
 
-### It works with options model 
+### [Options](https://k6.io/docs/es/usando-k6/opciones/) model 
 ![options](carbon.png)
