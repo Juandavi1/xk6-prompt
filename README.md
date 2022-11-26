@@ -1,6 +1,6 @@
 # xk6-prompt
 
-[<img src="gopher">](gopher.svg)
+[<img src="./gopher.svg">](./gopher.svg)
 
 
 ![k6 version](https://img.shields.io/badge/K6-v0.41.0-7d64ff)
