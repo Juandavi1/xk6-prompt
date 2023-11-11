@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/manifoldco/promptui"
-	"github.com/sirupsen/logrus"
 	"strconv"
 	"sync"
 	"sync/atomic"
@@ -18,13 +17,14 @@ var promptsValues atomic.Value
 
 type Prompt struct{}
 
-// ReadInt Read input as Int
+// ReadInt Read input as int from a prompt
+// and cache it for future use in other Goroutines (if needed)
 func (p *Prompt) ReadInt(label string) interface{} {
 
 	mutex.Lock()
 	defer mutex.Unlock()
 
-	if value, ok := ReadInputFromAtomic[int64](label); ok {
+	if value, ok := readInputFromAtomic[int64](label); ok {
 		return value
 	}
 
@@ -50,17 +50,18 @@ func (p *Prompt) ReadInt(label string) interface{} {
 
 	number, _ := strconv.ParseInt(result, 10, 64)
 
-	return LoadInputInAtomic[int64](label, number)
+	return loadInputInAtomic[int64](label, number)
 
 }
 
-// ReadString Read input as string
+// ReadString Read input as string from a prompt input field (text)
+// and cache it for future use in other Goroutines (if needed)
 func (p *Prompt) ReadString(label string) interface{} {
 
 	mutex.Lock()
 	defer mutex.Unlock()
 
-	if value, ok := ReadInputFromAtomic[string](label); ok {
+	if value, ok := readInputFromAtomic[string](label); ok {
 		return value
 	}
 
@@ -71,20 +72,20 @@ func (p *Prompt) ReadString(label string) interface{} {
 	result, err := prompt.Run()
 
 	if err != nil {
-		fmt.Printf("Prompt failed %v\n", err)
-		return ""
+		panic(err)
 	}
 
-	return LoadInputInAtomic[string](label, result)
+	return loadInputInAtomic[string](label, result)
 
 }
 
-// Select read input as string from a select
+// Select Read input as string from a prompt input field (text)
+// and cache it for future use in other Goroutines (if needed).
 func (p *Prompt) Select(label string, options ...string) interface{} {
 	mutex.Lock()
 	defer mutex.Unlock()
 
-	if value, ok := ReadInputFromAtomic[string](label); ok {
+	if value, ok := readInputFromAtomic[string](label); ok {
 		return value
 	}
 
@@ -96,16 +97,15 @@ func (p *Prompt) Select(label string, options ...string) interface{} {
 	_, result, err := prompt.Run()
 
 	if err != nil {
-		logrus.Errorf("Prompt failed %v\n", err)
-		return ""
+		panic(err)
 	}
 
-	return LoadInputInAtomic[string](label, result)
+	return loadInputInAtomic[string](label, result)
 
 }
 
-// ReadInputFromAtomic read an input entered from a cached list
-func ReadInputFromAtomic[T interface{}](label string) (T, bool) {
+// ReadInputFromAtomic read an input from an atomic map written by other Goroutines
+func readInputFromAtomic[T interface{}](label string) (T, bool) {
 	values := promptsValues.Load()
 	if values == nil {
 		inputsCached := make(map[string]interface{}, 100)
@@ -122,7 +122,7 @@ func ReadInputFromAtomic[T interface{}](label string) (T, bool) {
 }
 
 // LoadInputInAtomic write an input entered into an atomic map to be read by other Goroutines
-func LoadInputInAtomic[T interface{}](label string, value T) T {
+func loadInputInAtomic[T string | int64 | float32](label string, value T) T {
 	values := promptsValues.Load()
 	if values == nil {
 		inputsCached := make(map[string]interface{}, 100)

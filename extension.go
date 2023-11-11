@@ -1,9 +1,9 @@
 package prompt
 
 import (
-	"go.k6.io/k6/js/modules"
+	k6modules "go.k6.io/k6/js/modules"
 )
 
 func init() {
-	modules.Register("k6/x/prompt", new(Prompt))
+	k6modules.Register("k6/x/prompt", new(Prompt))
 }
