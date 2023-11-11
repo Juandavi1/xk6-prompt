@@ -6,7 +6,7 @@
 
 ![prompt_example](assets/prompt.svg)
 
-k6 extension that adds support for input arguments via UI.
+_k6 extension that adds support for input arguments via UI._
 
 #### Install
 
