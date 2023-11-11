@@ -61,7 +61,7 @@ export default function () {
 }
 ```
 
-### Continuous Test
+### Continuous Testing
 
 If you are in a **continuous testing environment** you can pass the input arguments via environment variables.
 
