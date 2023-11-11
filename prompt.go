@@ -2,7 +2,6 @@ package prompt
 
 import (
 	"errors"
-	"fmt"
 	"github.com/manifoldco/promptui"
 	"strconv"
 	"sync"
@@ -44,8 +43,7 @@ func (p *Prompt) ReadInt(label string) interface{} {
 	result, err := prompt.Run()
 
 	if err != nil {
-		fmt.Printf("Prompt failed %v\n", err)
-		return 0
+		panic(err)
 	}
 
 	number, _ := strconv.ParseInt(result, 10, 64)
