@@ -1,5 +1,6 @@
 # xk6-prompt
 
+[![Go](https://github.com/Juandavi1/xk6-prompt/actions/workflows/go.yml/badge.svg?branch=main)](https://github.com/Juandavi1/xk6-prompt/actions/workflows/go.yml)
 ![k6 version](https://img.shields.io/badge/K6-v0.47.0-7d64ff)
 ![xk6 version](https://img.shields.io/badge/Xk6-v0.9.2-7d64ff)
 ![xk6 version](https://img.shields.io/badge/Go-v1.19-79d4fd)
