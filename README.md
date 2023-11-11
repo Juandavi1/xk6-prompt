@@ -1,53 +1,114 @@
 # xk6-prompt
 
-![k6 version](https://img.shields.io/badge/K6-v0.41.0-7d64ff)
-![xk6 version](https://img.shields.io/badge/Xk6-v0.8.1-7d64ff)
+![k6 version](https://img.shields.io/badge/K6-v0.47.0-7d64ff)
+![xk6 version](https://img.shields.io/badge/Xk6-v0.9.2-7d64ff)
 ![xk6 version](https://img.shields.io/badge/Go-v1.19-79d4fd)
 
-![Alt text](prompt.svg)
+![prompt_example](assets/prompt.svg)
 
 k6 extension that adds support for input arguments via UI.
 
-
-#### Install 
+#### Install
 
 1. Install [xk6](https://github.com/grafana/xk6)
-```shell
+```console
 go install go.k6.io/xk6/cmd/xk6@latest
 ```
 2. Build the extension using:
 
-```shell
-xk6 build --with github.com/Juandavi1/xk6-prompt@0.0.1
+```console
+xk6 build --with github.com/Juandavi1/xk6-prompt
 ```
 
 #### Import
+
 ```js
-import prompt from 'k6/x/prompt';
+import prompt from 'bin/k6/x/prompt';
 ```
-
-> :warning: **If you are in a continuous testing environment, dont forget to add the conditional to read prompt inputs from [__ENV](https://k6.io/docs/using-k6/environment-variables/)**
-
-> :warning: **Example: const myNumber = __ENV.value ? __ENV.value : prompt.readInt("enter number")**
 
 
 #### Input select
 ```js
-const options = ["smoke", "load"]
-const selected = prompt.select("kind of test", ...options)
+export default function () {
+  const options = ["smoke", "load"]
+  const selected = prompt.select("kind of test", ...options)
+  console.log(typeof selected === "string")
+}
 ```
 
 #### Read string
 ```js
-const inputString = prompt.readString("type a string")
-console.log(typeof inputString)
+export default function () {
+  const inputString = prompt.readString("type a string")
+  console.log(typeof inputString === "string")
+}
 ```
 
 #### Read int
 ```js
-const inputNumber = prompt.readInt("Type a number")
-console.log(typeof inputNumber)
+export default function () {
+  const inputNumber = prompt.readInt("Type a number")
+  console.log(typeof inputNumber === "number")
+}
 ```
 
-### [Options](https://k6.io/docs/es/usando-k6/opciones/) model 
-![options](carbon.png)
+#### Read float
+```js
+export default function () {
+  const inputNumber = prompt.readFloat("Type a float")
+  console.log(typeof inputNumber === "number")
+}
+```
+
+### Continuous Test
+
+If you are in a **continuous testing environment** you can pass the input arguments via environment variables.
+
+Example:
+
+#### 
+```js
+export default function () {
+    const myNumber = __ENV.num ? __ENV.num : prompt.readInt("enter a number")
+    console.log(typeof myNumber === "number")
+}
+```
+
+And run the test with the environment variable:
+
+```console
+k6 run -e num=10 script.js
+```
+
+
+### Manually building from source
+
+Install Go tools [1.19](https://golang.org/doc/install)
+
+Clone this repo 
+```console
+git clone git@github.com:Juandavi1/xk6-prompt.git
+```
+
+Install dependencies
+```console
+make install
+```
+
+Build the extension binary
+```console
+make build
+```
+
+Execute the example using the extension binary
+```console
+make run
+```
+
+### Examples 
+
+You can find more examples in the [examples](examples) folder.
+
+<br/>
+
+*#HavingFunLearning* 🦾
